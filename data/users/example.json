@@ -1,0 +1,13 @@
+{
+  "minecraftUuid": "example-uuid-here",
+  "badge": "AMT",
+  "displayName": "",
+  "equippedCape": null,
+  "badgeVisibility": {
+    "launcher": true,
+    "inGame": true
+  },
+  "profileVisibility": "public",
+  "githubId": null,
+  "joinedAt": "2026-06-28T00:00:00Z"
+}

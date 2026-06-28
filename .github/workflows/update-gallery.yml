@@ -1,0 +1,37 @@
+name: Update Gallery Index
+
+on:
+  push:
+    paths:
+      - 'data/capes/**'
+  workflow_dispatch:
+
+jobs:
+  build-index:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Build gallery index
+        run: |
+          echo '{ "capes": [' > /tmp/gallery.json
+          FIRST=true
+          for f in data/capes/*.json; do
+            if [ "$f" = "data/capes/example.json" ]; then continue; fi
+            if [ "$FIRST" = true ]; then
+              FIRST=false
+            else
+              echo "," >> /tmp/gallery.json
+            fi
+            cat "$f" >> /tmp/gallery.json
+          done
+          echo '], "lastUpdated": "'$(date -u +%Y-%m-%dT%H:%M:%SZ)'" }' >> /tmp/gallery.json
+          mv /tmp/gallery.json data/gallery.json
+          
+      - name: Commit and push
+        run: |
+          git config user.name "AMT Bot"
+          git config user.email "bot@amt-client.com"
+          git add data/gallery.json
+          git commit -m "Update gallery index" || echo "No changes"
+          git push

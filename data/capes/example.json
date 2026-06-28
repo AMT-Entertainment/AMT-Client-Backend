@@ -1,0 +1,13 @@
+{
+  "id": "example-cape-id",
+  "title": "My First Cape",
+  "author": "Player",
+  "authorUuid": "example-uuid-here",
+  "uploadDate": "2026-06-28T00:00:00Z",
+  "votes": 0,
+  "trending": 0,
+  "public": true,
+  "animated": false,
+  "frameCount": 1,
+  "frameDelay": 0
+}

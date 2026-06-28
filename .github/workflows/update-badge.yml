@@ -1,0 +1,46 @@
+name: Update Badge
+
+on:
+  repository_dispatch:
+    types: [update-badge]
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Update user badge
+        run: |
+          UUID="${{ github.event.client_payload.user_uuid }}"
+          BADGE="${{ github.event.client_payload.badge }}"
+          DISPLAY_NAME="${{ github.event.client_payload.display_name }}"
+          
+          FILE="data/users/${UUID}.json"
+          if [ -f "$FILE" ]; then
+            TMP=$(mktemp)
+            jq --arg badge "$BADGE" --arg name "$DISPLAY_NAME" \
+              '.badge = $badge | .displayName = $name' "$FILE" > "$TMP"
+            mv "$TMP" "$FILE"
+          else
+            cat > "$FILE" << 'EOF'
+          {
+            "minecraftUuid": "$UUID",
+            "badge": "$BADGE",
+            "displayName": "$DISPLAY_NAME",
+            "equippedCape": null,
+            "badgeVisibility": {"launcher": true, "inGame": true},
+            "profileVisibility": "public",
+            "githubId": null,
+            "joinedAt": "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          }
+          EOF
+          fi
+          
+      - name: Commit and push
+        run: |
+          git config user.name "AMT Bot"
+          git config user.email "bot@amt-client.com"
+          git add data/users/
+          git commit -m "Update badge for ${{ github.event.client_payload.user_uuid }}"
+          git push

@@ -1,0 +1,46 @@
+name: Upload Cape
+
+on:
+  repository_dispatch:
+    types: [upload-cape]
+
+jobs:
+  upload:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Validate payload
+        run: |
+          echo "Validating cape upload..."
+          echo "User: ${{ github.event.client_payload.user_uuid }}"
+          
+      - name: Save cape metadata
+        run: |
+          cat > data/capes/${{ github.event.client_payload.cape_id }}.json << 'EOF'
+          {
+            "id": "${{ github.event.client_payload.cape_id }}",
+            "title": "${{ github.event.client_payload.cape_title }}",
+            "author": "${{ github.event.client_payload.author }}",
+            "authorUuid": "${{ github.event.client_payload.user_uuid }}",
+            "uploadDate": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+            "votes": 0,
+            "trending": 0,
+            "public": true,
+            "animated": ${{ github.event.client_payload.animated || false }},
+            "frameCount": ${{ github.event.client_payload.frame_count || 1 }},
+            "frameDelay": ${{ github.event.client_payload.frame_delay || 0 }}
+          }
+          EOF
+          
+      - name: Save cape PNG
+        run: |
+          echo "${{ github.event.client_payload.cape_data }}" | base64 -d > assets/capes/${{ github.event.client_payload.cape_id }}.png
+          
+      - name: Commit and push
+        run: |
+          git config user.name "AMT Bot"
+          git config user.email "bot@amt-client.com"
+          git add data/capes/ assets/capes/
+          git commit -m "Upload cape ${{ github.event.client_payload.cape_id }}"
+          git push

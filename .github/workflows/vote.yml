@@ -1,0 +1,35 @@
+name: Vote on Cape
+
+on:
+  repository_dispatch:
+    types: [vote-cape]
+
+jobs:
+  vote:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Update cape vote count
+        run: |
+          CAPE_ID="${{ github.event.client_payload.cape_id }}"
+          DIRECTION="${{ github.event.client_payload.direction }}"
+          FILE="data/capes/${CAPE_ID}.json"
+          
+          if [ -f "$FILE" ]; then
+            TMP=$(mktemp)
+            if [ "$DIRECTION" = "up" ]; then
+              jq '.votes += 1 | .trending += 1' "$FILE" > "$TMP"
+            elif [ "$DIRECTION" = "down" ]; then
+              jq '.votes -= 1 | .trending -= 1' "$FILE" > "$TMP"
+            fi
+            mv "$TMP" "$FILE"
+          fi
+          
+      - name: Commit and push
+        run: |
+          git config user.name "AMT Bot"
+          git config user.email "bot@amt-client.com"
+          git add data/capes/
+          git commit -m "Vote on cape $CAPE_ID" || echo "No changes"
+          git push
