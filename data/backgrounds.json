@@ -1,27 +1,13 @@
 {
   "wallpapers": [
     {
-      "url": "https://wallpaperaccess.com/full/109815.jpg",
-      "credit": "Mojang Studios",
-      "creditUrl": "https://www.minecraft.net",
-      "thumbnail": "",
-      "dark": true
-    },
-    {
-      "url": "https://wallpaperaccess.com/full/109813.jpg",
-      "credit": "Mojang Studios",
-      "creditUrl": "https://www.minecraft.net",
-      "thumbnail": "",
-      "dark": true
-    },
-    {
-      "url": "https://wallpaperaccess.com/full/109821.jpg",
+      "url": "https://raw.githubusercontent.com/AMT-Entertainment/AMT-Client-Backend/main/assets/wallpapers/wallpaper_minecraft_bedrock_edition_800x450.png",
       "credit": "Mojang Studios",
       "creditUrl": "https://www.minecraft.net",
       "thumbnail": "",
       "dark": true
     }
   ],
-  "default": "https://wallpaperaccess.com/full/109815.jpg",
+  "default": "https://raw.githubusercontent.com/AMT-Entertainment/AMT-Client-Backend/main/assets/wallpapers/wallpaper_minecraft_bedrock_edition_800x450.png",
   "lastUpdated": "2026-06-28T00:00:00Z"
 }
