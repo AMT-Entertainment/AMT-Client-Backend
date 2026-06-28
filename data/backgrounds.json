@@ -1,0 +1,27 @@
+{
+  "wallpapers": [
+    {
+      "url": "https://wallpaperaccess.com/full/109815.jpg",
+      "credit": "Mojang Studios",
+      "creditUrl": "https://www.minecraft.net",
+      "thumbnail": "",
+      "dark": true
+    },
+    {
+      "url": "https://wallpaperaccess.com/full/109813.jpg",
+      "credit": "Mojang Studios",
+      "creditUrl": "https://www.minecraft.net",
+      "thumbnail": "",
+      "dark": true
+    },
+    {
+      "url": "https://wallpaperaccess.com/full/109821.jpg",
+      "credit": "Mojang Studios",
+      "creditUrl": "https://www.minecraft.net",
+      "thumbnail": "",
+      "dark": true
+    }
+  ],
+  "default": "https://wallpaperaccess.com/full/109815.jpg",
+  "lastUpdated": "2026-06-28T00:00:00Z"
+}

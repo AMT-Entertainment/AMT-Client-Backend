@@ -1,0 +1,20 @@
+[
+  {
+    "buildId": 1,
+    "commitId": "init",
+    "branch": "stable",
+    "subsystem": "fabric",
+    "lbVersion": "0.1.0",
+    "mcVersion": "1.21.4",
+    "release": true,
+    "date": "2026-06-28T00:00:00Z",
+    "message": "Initial AMT Client build",
+    "url": "",
+    "jreDistribution": "temurin",
+    "jreVersion": 21,
+    "fabricApiVersion": "0.100.0",
+    "fabricLoaderVersion": "0.16.0",
+    "kotlinVersion": "1.9.0",
+    "kotlinModVersion": "4.0.0"
+  }
+]
