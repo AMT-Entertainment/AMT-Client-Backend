@@ -1,0 +1,19 @@
+{
+  "items": [
+    {
+      "postId": 1,
+      "postUid": "welcome",
+      "author": "AMT Team",
+      "title": "Welcome to AMT Client",
+      "description": "The AMT Client is here! A performance-focused Minecraft launcher with deep customizability, cosmetics, and social features.",
+      "date": "2026-06-28T00:00:00Z",
+      "bannerText": "Welcome!",
+      "bannerImageUrl": ""
+    }
+  ],
+  "pagination": {
+    "current": 1,
+    "pages": 1,
+    "items": 1
+  }
+}

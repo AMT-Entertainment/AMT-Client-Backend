@@ -1,0 +1,13 @@
+[
+  {
+    "required": true,
+    "enabled": true,
+    "name": "AMT Client Mod",
+    "source": {
+      "type": "skip",
+      "artifactName": "amt-client-0.1.0",
+      "url": "https://raw.githubusercontent.com/AMT-Entertainment/AMT-Client-Backend/main/assets/mods/amt-client-0.1.0.jar",
+      "extract": false
+    }
+  }
+]

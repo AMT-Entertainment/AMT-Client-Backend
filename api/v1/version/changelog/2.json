@@ -1,0 +1,21 @@
+{
+  "build": {
+    "buildId": 2,
+    "commitId": "init",
+    "branch": "stable",
+    "subsystem": "fabric",
+    "lbVersion": "0.1.0",
+    "mcVersion": "26.1.2",
+    "release": true,
+    "date": "2026-06-28T00:00:00Z",
+    "message": "Updated to Minecraft 26.1.2",
+    "url": "",
+    "jreDistribution": "temurin",
+    "jreVersion": 25,
+    "fabricApiVersion": "0.153.0",
+    "fabricLoaderVersion": "0.18.4",
+    "kotlinVersion": "1.9.0",
+    "kotlinModVersion": "4.0.0"
+  },
+  "changelog": "Updated to Minecraft 26.1.2 (Tiny Takeover). Fabric API 0.153.0, Fabric Loader 0.18.4. Requires Java 25."
+}

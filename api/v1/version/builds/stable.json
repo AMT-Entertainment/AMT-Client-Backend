@@ -1,0 +1,38 @@
+[
+  {
+    "buildId": 2,
+    "commitId": "init",
+    "branch": "stable",
+    "subsystem": "fabric",
+    "lbVersion": "0.1.0",
+    "mcVersion": "26.1.2",
+    "release": true,
+    "date": "2026-06-28T00:00:00Z",
+    "message": "Updated to Minecraft 26.1.2",
+    "url": "",
+    "jreDistribution": "temurin",
+    "jreVersion": 25,
+    "fabricApiVersion": "0.153.0",
+    "fabricLoaderVersion": "0.19.0",
+    "kotlinVersion": "1.9.0",
+    "kotlinModVersion": "4.0.0"
+  },
+  {
+    "buildId": 3,
+    "commitId": "init",
+    "branch": "stable",
+    "subsystem": "fabric",
+    "lbVersion": "0.1.0",
+    "mcVersion": "1.21.11",
+    "release": true,
+    "date": "2026-06-28T00:00:00Z",
+    "message": "Added support for Minecraft 1.21.11 (Mounts of Mayhem)",
+    "url": "",
+    "jreDistribution": "temurin",
+    "jreVersion": 21,
+    "fabricApiVersion": "0.141.3",
+    "fabricLoaderVersion": "0.19.0",
+    "kotlinVersion": "1.9.0",
+    "kotlinModVersion": "4.0.0"
+  }
+]

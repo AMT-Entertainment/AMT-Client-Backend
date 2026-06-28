@@ -1,0 +1,104 @@
+{
+  "wallpapers": [
+    {
+      "url": "https://raw.githubusercontent.com/AMT-Entertainment/AMT-Client-Backend/main/assets/wallpapers/wallpaper_minecraft_caves_cliffs(part2)_1920x1080.png",
+      "credit": "Mojang Studios",
+      "creditUrl": "https://www.minecraft.net",
+      "thumbnail": "",
+      "dark": true
+    },
+    {
+      "url": "https://raw.githubusercontent.com/AMT-Entertainment/AMT-Client-Backend/main/assets/wallpapers/wallpaper_minecraft_trickytrials_1920x1080.png",
+      "credit": "Mojang Studios",
+      "creditUrl": "https://www.minecraft.net",
+      "thumbnail": "",
+      "dark": true
+    },
+    {
+      "url": "https://raw.githubusercontent.com/AMT-Entertainment/AMT-Client-Backend/main/assets/wallpapers/wallpaper_minecraft_burberry_1920x1080.png",
+      "credit": "Mojang Studios",
+      "creditUrl": "https://www.minecraft.net",
+      "thumbnail": "",
+      "dark": true
+    },
+    {
+      "url": "https://raw.githubusercontent.com/AMT-Entertainment/AMT-Client-Backend/main/assets/wallpapers/wallpaper_minecraft_caves_cliffs(part1)_1920x1080.png",
+      "credit": "Mojang Studios",
+      "creditUrl": "https://www.minecraft.net",
+      "thumbnail": "",
+      "dark": true
+    },
+    {
+      "url": "https://raw.githubusercontent.com/AMT-Entertainment/AMT-Client-Backend/main/assets/wallpapers/wallpaper_minecraft_update_aquatic_1920x1080.png",
+      "credit": "Mojang Studios",
+      "creditUrl": "https://www.minecraft.net",
+      "thumbnail": "",
+      "dark": true
+    },
+    {
+      "url": "https://raw.githubusercontent.com/AMT-Entertainment/AMT-Client-Backend/main/assets/wallpapers/wallpaper_minecraft_cats_pandas_1920x1080.png",
+      "credit": "Mojang Studios",
+      "creditUrl": "https://www.minecraft.net",
+      "thumbnail": "",
+      "dark": true
+    },
+    {
+      "url": "https://raw.githubusercontent.com/AMT-Entertainment/AMT-Client-Backend/main/assets/wallpapers/wallpaper_minecraft_bedrock_edition_800x450.png",
+      "credit": "Mojang Studios",
+      "creditUrl": "https://www.minecraft.net",
+      "thumbnail": "",
+      "dark": true
+    },
+    {
+      "url": "https://raw.githubusercontent.com/AMT-Entertainment/AMT-Client-Backend/main/assets/wallpapers/wallpaper_tiny_takeover_axo_800x450.png",
+      "credit": "Mojang Studios",
+      "creditUrl": "https://www.minecraft.net",
+      "thumbnail": "",
+      "dark": true
+    },
+    {
+      "url": "https://raw.githubusercontent.com/AMT-Entertainment/AMT-Client-Backend/main/assets/wallpapers/wallpaper_tiny_takeover_bee_800x450.png",
+      "credit": "Mojang Studios",
+      "creditUrl": "https://www.minecraft.net",
+      "thumbnail": "",
+      "dark": true
+    },
+    {
+      "url": "https://raw.githubusercontent.com/AMT-Entertainment/AMT-Client-Backend/main/assets/wallpapers/MCV_HOL25Drop_MoM_DotNet_Wallpaper_800x450.png",
+      "credit": "Mojang Studios",
+      "creditUrl": "https://www.minecraft.net",
+      "thumbnail": "",
+      "dark": true
+    },
+    {
+      "url": "https://raw.githubusercontent.com/AMT-Entertainment/AMT-Client-Backend/main/assets/wallpapers/MCV_SummerDrop_Hero_DotNet_Downloadable_Wallpaper_r800x450.png",
+      "credit": "Mojang Studios",
+      "creditUrl": "https://www.minecraft.net",
+      "thumbnail": "",
+      "dark": true
+    },
+    {
+      "url": "https://raw.githubusercontent.com/AMT-Entertainment/AMT-Client-Backend/main/assets/wallpapers/Minecraft_Fall_Drop_Campaign_Key_Art_DotNet_Downloadable_Wallpaper_800x450.png",
+      "credit": "Mojang Studios",
+      "creditUrl": "https://www.minecraft.net",
+      "thumbnail": "",
+      "dark": true
+    },
+    {
+      "url": "https://raw.githubusercontent.com/AMT-Entertainment/AMT-Client-Backend/main/assets/wallpapers/MCV_SummerDropKeyArt_NetDownloadableWallpaper_800x450.png",
+      "credit": "Mojang Studios",
+      "creditUrl": "https://www.minecraft.net",
+      "thumbnail": "",
+      "dark": true
+    },
+    {
+      "url": "https://raw.githubusercontent.com/AMT-Entertainment/AMT-Client-Backend/main/assets/wallpapers/MCV_SPR26Drop_TT_DotNet_Wallpaper_800x450.png",
+      "credit": "Mojang Studios",
+      "creditUrl": "https://www.minecraft.net",
+      "thumbnail": "",
+      "dark": true
+    }
+  ],
+  "default": "https://raw.githubusercontent.com/AMT-Entertainment/AMT-Client-Backend/main/assets/wallpapers/wallpaper_minecraft_caves_cliffs(part2)_1920x1080.png",
+  "lastUpdated": "2026-06-28T00:00:00Z"
+}
