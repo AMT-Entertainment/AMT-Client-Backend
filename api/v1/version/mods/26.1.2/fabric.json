@@ -2,12 +2,62 @@
   {
     "required": true,
     "enabled": true,
+    "name": "Fabric API",
+    "source": {
+      "type": "skip",
+      "artifactName": "fabric-api-26.1.2",
+      "url": "https://cdn.modrinth.com/data/P7dR8mSH/versions/WC1KT7Yg/fabric-api-0.153.0%2B26.1.2.jar"
+    }
+  },
+  {
+    "required": true,
+    "enabled": true,
     "name": "AMT Client Mod",
     "source": {
       "type": "skip",
       "artifactName": "amt-client-0.1.0",
       "url": "https://raw.githubusercontent.com/AMT-Entertainment/AMT-Client-Backend/main/assets/mods/amt-client-0.1.0.jar",
       "extract": false
+    }
+  },
+  {
+    "required": false,
+    "default": true,
+    "name": "Sodium",
+    "source": {
+      "type": "skip",
+      "artifactName": "sodium-26.1.2",
+      "url": "https://cdn.modrinth.com/data/AANobbMI/versions/NPVnpcnt/sodium-fabric-0.9.1-beta.2%2Bmc26.1.2.jar"
+    }
+  },
+  {
+    "required": false,
+    "default": true,
+    "name": "Iris",
+    "source": {
+      "type": "skip",
+      "artifactName": "iris-26.1.2",
+      "url": "https://cdn.modrinth.com/data/YL57xq9U/versions/MwcLS51S/iris-fabric-1.10.9%2Bmc26.1.1.jar"
+    }
+  },
+  {
+    "required": false,
+    "default": true,
+    "name": "Lithium",
+    "source": {
+      "type": "skip",
+      "artifactName": "lithium-26.1.2",
+      "url": "https://cdn.modrinth.com/data/gvQqBUqZ/versions/fQBdPR1m/lithium-fabric-0.24.6%2Bmc26.1.2.jar"
+    }
+  },
+  {
+    "required": false,
+    "default": true,
+    "name": "Sodium Extra",
+    "source": {
+      "type": "skip",
+      "artifactName": "sodium-extra-26.1.2",
+      "url": "https://cdn.modrinth.com/data/PtjYWJkn/versions/ZNsItfUy/sodium-extra-fabric-0.9.0%2Bmc26.1.2.jar"
     }
   }
 ]
