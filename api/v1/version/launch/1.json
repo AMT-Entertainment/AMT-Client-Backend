@@ -2,7 +2,7 @@
   "build": {
     "buildId": 1,
     "commitId": "init",
-    "branch": "stable",
+    "branch": "legacy",
     "subsystem": "fabric",
     "lbVersion": "0.1.0",
     "mcVersion": "1.21.4",
@@ -22,6 +22,18 @@
     "manifest": "fabric-loader-0.16.0-1.21.4",
     "modDirectory": "mods"
   },
-  "mods": [],
+  "mods": [
+    {
+      "required": true,
+      "enabled": true,
+      "name": "AMT Client Mod",
+      "source": {
+        "type": "skip",
+        "artifactName": "amt-client-0.1.0",
+        "url": "https://raw.githubusercontent.com/AMT-Entertainment/AMT-Client-Backend/main/assets/mods/amt-client-0.1.0.jar",
+        "extract": false
+      }
+    }
+  ],
   "repositories": {}
 }
