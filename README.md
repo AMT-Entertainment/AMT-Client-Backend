@@ -31,6 +31,61 @@ raw.githubusercontent.com/OWNER/REPO/main/
 
 See [BACKEND_SETUP.md](../BACKEND_SETUP.md) for the full guide.
 
+## Social Platform
+
+The social backend server (`server/`) provides real-time social features:
+
+- **Feed** with @mentions and #hashtags
+- **Minecraft identity** — profile locked to Minecraft username + skin, only badge is editable
+- **Server sharing** — share AMT servers or custom IP servers
+- **Badge & Cape showcase** — share cosmetics in posts
+- **Recommendation ranking** — feed sorted by likes + recency
+- **Trending hashtags** — discover popular topics
+
+### Deploy the Social Server
+
+**Option 1: Docker** (recommended)
+```bash
+docker build -t amt-social-server server/
+docker run -d -p 8080:8080 -v amt_social_data:/data amt-social-server
+```
+
+**Option 2: Railway / Fly.io**
+```bash
+# Deploy the server/ directory directly
+# Set BIND=0.0.0.0:8080 and DB_PATH=/data/amt_social.db
+```
+
+**Option 3: Bare metal**
+```bash
+cd server
+cargo run --release
+# Binds to 0.0.0.0:8080 by default, set BIND=0.0.0.0:3000 to change
+```
+
+> **Configure in launcher:** Settings → General → set `Social API URL` to your deployed server URL
+
+### API Endpoints
+
+| Method | Path | Description |
+|--------|------|-------------|
+| POST | `/api/social/register` | Register/update user (uuid, mc_username, badge) |
+| GET | `/api/social/users/:uuid` | Get user profile |
+| POST | `/api/social/posts` | Create a post (supports @mentions, #hashtags, attachments) |
+| GET | `/api/social/feed` | Get global feed (query: tag, user, search, limit, offset) |
+| GET | `/api/social/posts/:id` | Get single post |
+| POST | `/api/social/posts/:id/like` | Like/unlike a post |
+| GET | `/api/social/hashtags` | Trending hashtags (last 7 days) |
+
+### Post Types
+
+| Type | Description | attachment_data |
+|------|-------------|-----------------|
+| `text` | Plain text with @mentions and #hashtags | null |
+| `server_invite` | Server share | `{ server_id, server_name, server_type, mc_version, address, player_count, max_players }` |
+| `badge_showcase` | Badge share | `{ badge, minecraft_username }` |
+| `cosmetics_share` | Cape showcase | `{ cape_id, badge_text }` |
+
 ## Workflows
 
 | Workflow | Trigger | Description |
