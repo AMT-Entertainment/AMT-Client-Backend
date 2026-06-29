@@ -7,6 +7,8 @@ use axum::{
     routing::{get, post},
     Json, Router,
 };
+use axum::body::Body;
+use axum::response::Response;
 use chrono::Utc;
 use rusqlite::Connection;
 use serde::{Deserialize, Serialize};
@@ -40,6 +42,7 @@ async fn main() {
         .route("/api/social/users/:uuid/update", post(update_user_profile))
         .route("/api/social/hashtags", get(trending_hashtags))
         .route("/api/social/search", get(search_posts))
+        .route("/assets/mods/{filename}", get(serve_asset))
         .layer(CorsLayer::permissive())
         .with_state(db);
 
@@ -576,4 +579,38 @@ fn extract_mentions(content: &str) -> Vec<String> {
         .map(|w| w[1..].to_lowercase())
         .filter(|t| !t.is_empty())
         .collect()
+}
+
+// ── Asset Serving ──
+
+async fn serve_asset(Path(filename): Path<String>) -> Response {
+    let assets_dir = std::env::var("ASSETS_DIR").unwrap_or_else(|_| ".".to_string());
+    let path = std::path::Path::new(&assets_dir).join("assets").join("mods").join(&filename);
+
+    if !path.exists() {
+        return Response::builder()
+            .status(StatusCode::NOT_FOUND)
+            .body(Body::from("Not found"))
+            .unwrap();
+    }
+
+    match tokio::fs::read(&path).await {
+        Ok(data) => {
+            let mime = if filename.ends_with(".jar") {
+                "application/java-archive"
+            } else {
+                "application/octet-stream"
+            };
+            Response::builder()
+                .status(StatusCode::OK)
+                .header("Content-Type", mime)
+                .header("Cache-Control", "no-cache, no-store, must-revalidate")
+                .body(Body::from(data))
+                .unwrap()
+        }
+        Err(_) => Response::builder()
+            .status(StatusCode::INTERNAL_SERVER_ERROR)
+            .body(Body::from("Failed to read file"))
+            .unwrap(),
+    }
 }
