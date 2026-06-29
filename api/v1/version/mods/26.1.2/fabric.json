@@ -16,7 +16,7 @@
     "source": {
       "type": "skip",
       "artifactName": "amt-client-0.1.0",
-      "url": "https://amt-client-backend.onrender.com/assets/mods/amt-client-0.1.0.jar",
+      "url": "https://raw.githubusercontent.com/AMT-Entertainment/AMT-Client-Backend/main/assets/mods/amt-client-0.1.0.jar",
       "extract": false
     }
   },
