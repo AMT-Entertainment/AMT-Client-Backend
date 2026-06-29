@@ -22,7 +22,7 @@ async fn main() {
 
     let db_path = std::env::var("DB_PATH").unwrap_or_else(|_| "amt_social.db".to_string());
     let bind = std::env::var("BIND").unwrap_or_else(|_| "0.0.0.0:8080".to_string());
-    let cors_origin = std::env::var("CORS_ORIGIN").unwrap_or_else(|_| "*".to_string());
+    let _cors_origin = std::env::var("CORS_ORIGIN").unwrap_or_else(|_| "*".to_string());
 
     let conn = Connection::open(&db_path).expect("Failed to open database");
     init_db(&conn);
@@ -37,6 +37,7 @@ async fn main() {
         .route("/api/social/feed", get(get_feed))
         .route("/api/social/posts/:id", get(get_post))
         .route("/api/social/posts/:id/like", post(like_post))
+        .route("/api/social/users/:uuid/update", post(update_user_profile))
         .route("/api/social/hashtags", get(trending_hashtags))
         .route("/api/social/search", get(search_posts))
         .layer(CorsLayer::permissive())
@@ -57,6 +58,7 @@ fn init_db(conn: &Connection) {
             minecraft_username TEXT NOT NULL,
             badge TEXT NOT NULL DEFAULT '',
             equipped_cape TEXT,
+            youtube_link TEXT NOT NULL DEFAULT '',
             joined_at TEXT NOT NULL,
             last_seen_at TEXT NOT NULL
         );
@@ -104,6 +106,7 @@ struct UserRecord {
     minecraft_username: String,
     badge: String,
     equipped_cape: Option<String>,
+    youtube_link: String,
     joined_at: String,
     last_seen_at: String,
 }
@@ -112,6 +115,13 @@ struct UserRecord {
 struct RegisterRequest {
     uuid: String,
     minecraft_username: String,
+    badge: Option<String>,
+    youtube_link: Option<String>,
+}
+
+#[derive(Debug, Deserialize)]
+struct UpdateProfileRequest {
+    youtube_link: Option<String>,
     badge: Option<String>,
 }
 
@@ -164,16 +174,18 @@ async fn register_user(
     let now = Utc::now().to_rfc3339();
 
     let result = db.execute(
-        "INSERT INTO users (uuid, minecraft_username, badge, joined_at, last_seen_at)
-         VALUES (?1, ?2, ?3, ?4, ?5)
+        "INSERT INTO users (uuid, minecraft_username, badge, youtube_link, joined_at, last_seen_at)
+         VALUES (?1, ?2, ?3, ?4, ?5, ?6)
          ON CONFLICT(uuid) DO UPDATE SET
             minecraft_username = excluded.minecraft_username,
             badge = COALESCE(NULLIF(excluded.badge, ''), users.badge),
+            youtube_link = COALESCE(NULLIF(excluded.youtube_link, ''), users.youtube_link),
             last_seen_at = excluded.last_seen_at",
         rusqlite::params![
             req.uuid,
             req.minecraft_username,
             req.badge.unwrap_or_default(),
+            req.youtube_link.unwrap_or_default(),
             now,
             now,
         ],
@@ -194,7 +206,7 @@ async fn get_user(
 ) -> impl IntoResponse {
     let db = db.lock().await;
     let mut stmt = db
-        .prepare("SELECT uuid, minecraft_username, badge, equipped_cape, joined_at, last_seen_at FROM users WHERE uuid = ?1")
+        .prepare("SELECT uuid, minecraft_username, badge, equipped_cape, youtube_link, joined_at, last_seen_at FROM users WHERE uuid = ?1")
         .unwrap();
 
     let user = stmt
@@ -204,8 +216,9 @@ async fn get_user(
                 minecraft_username: row.get(1)?,
                 badge: row.get(2)?,
                 equipped_cape: row.get(3)?,
-                joined_at: row.get(4)?,
-                last_seen_at: row.get(5)?,
+                youtube_link: row.get(4)?,
+                joined_at: row.get(5)?,
+                last_seen_at: row.get(6)?,
             })
         })
         .ok();
@@ -214,6 +227,30 @@ async fn get_user(
         Some(u) => Json(serde_json::json!(u)).into_response(),
         None => (StatusCode::NOT_FOUND, "User not found").into_response(),
     }
+}
+
+async fn update_user_profile(
+    State(db): State<Db>,
+    Path(uuid): Path<String>,
+    Json(req): Json<UpdateProfileRequest>,
+) -> impl IntoResponse {
+    let db = db.lock().await;
+
+    if let Some(yl) = &req.youtube_link {
+        let _ = db.execute(
+            "UPDATE users SET youtube_link = ?1 WHERE uuid = ?2",
+            rusqlite::params![yl, uuid],
+        );
+    }
+
+    if let Some(b) = &req.badge {
+        let _ = db.execute(
+            "UPDATE users SET badge = ?1 WHERE uuid = ?2",
+            rusqlite::params![b, uuid],
+        );
+    }
+
+    Json(serde_json::json!({"ok": true}))
 }
 
 async fn create_post(
