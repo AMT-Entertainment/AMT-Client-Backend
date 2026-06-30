@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: amt-social-server
+    env: docker
+    repo: https://github.com/AMT-Entertainment/AMT-Client-Backend
+    region: frankfurt
+    plan: free
+    dockerfilePath: ./server/Dockerfile
+    envVars:
+      - key: DB_PATH
+        value: /data/amt_social.db
+      - key: BIND
+        value: 0.0.0.0:8080
+      - key: CORS_ORIGIN
+        value: "*"
+    disk:
+      name: sqlite-data
+      mountPath: /data
+      sizeGB: 1
