@@ -156,6 +156,7 @@ struct FeedQuery {
     search: Option<String>,
     limit: Option<i64>,
     offset: Option<i64>,
+    user_uuid: Option<String>,
 }
 
 #[derive(Debug, Serialize)]
@@ -205,9 +206,13 @@ async fn get_user(
     Path(uuid): Path<String>,
 ) -> impl IntoResponse {
     let db = db.lock().await;
-    let mut stmt = db
-        .prepare("SELECT uuid, minecraft_username, badge, equipped_cape, youtube_link, joined_at, last_seen_at FROM users WHERE uuid = ?1")
-        .unwrap();
+    let mut stmt = match db.prepare("SELECT uuid, minecraft_username, badge, equipped_cape, youtube_link, joined_at, last_seen_at FROM users WHERE uuid = ?1") {
+        Ok(s) => s,
+        Err(e) => {
+            error!("Failed to prepare get_user query: {e}");
+            return (StatusCode::INTERNAL_SERVER_ERROR, "Query failed").into_response();
+        }
+    };
 
     let user = stmt
         .query_row(rusqlite::params![uuid], |row| {
@@ -237,17 +242,21 @@ async fn update_user_profile(
     let db = db.lock().await;
 
     if let Some(yl) = &req.youtube_link {
-        let _ = db.execute(
+        if let Err(e) = db.execute(
             "UPDATE users SET youtube_link = ?1 WHERE uuid = ?2",
             rusqlite::params![yl, uuid],
-        );
+        ) {
+            error!("Failed to update youtube_link for {uuid}: {e}");
+        }
     }
 
     if let Some(b) = &req.badge {
-        let _ = db.execute(
+        if let Err(e) = db.execute(
             "UPDATE users SET badge = ?1 WHERE uuid = ?2",
             rusqlite::params![b, uuid],
-        );
+        ) {
+            error!("Failed to update badge for {uuid}: {e}");
+        }
     }
 
     Json(serde_json::json!({"ok": true}))
@@ -374,16 +383,36 @@ async fn get_feed(
         .query_row(&count_query, rusqlite::params_from_iter(params.iter().map(|p| p.as_ref())), |row| row.get(0))
         .unwrap_or(0);
 
+    // Determine if we can compute liked_by_me
+    let user_uuid = query.user_uuid.as_deref().unwrap_or("");
+    let has_user = !user_uuid.is_empty();
+
     // Get posts sorted by recommendation score: likes*10 + recency in hours
-    let feed_query = format!(
-        "SELECT p.id, p.author_uuid, p.content, p.post_type, p.attachment_data, p.created_at, p.likes,
-                u.minecraft_username, u.badge
-         FROM posts p
-         JOIN users u ON p.author_uuid = u.uuid
-         {where_sql}
-         ORDER BY (p.likes * 10 + CAST((julianday('now') - julianday(p.created_at)) * -24 AS INTEGER)) DESC
-         LIMIT ? OFFSET ?"
-    );
+    let feed_query = if has_user {
+        format!(
+            "SELECT p.id, p.author_uuid, p.content, p.post_type, p.attachment_data, p.created_at, p.likes,
+                    u.minecraft_username, u.badge,
+                    CASE WHEN l.user_uuid IS NOT NULL THEN 1 ELSE 0 END as liked_by_me
+             FROM posts p
+             JOIN users u ON p.author_uuid = u.uuid
+             LEFT JOIN likes l ON l.post_id = p.id AND l.user_uuid = ?{}
+             {where_sql}
+             ORDER BY (p.likes * 10 + CAST((julianday('now') - julianday(p.created_at)) * -24 AS INTEGER)) DESC
+             LIMIT ? OFFSET ?",
+            // Calculate the position for user_uuid param
+            if params.is_empty() { 0 } else { params.len() }
+        )
+    } else {
+        format!(
+            "SELECT p.id, p.author_uuid, p.content, p.post_type, p.attachment_data, p.created_at, p.likes,
+                    u.minecraft_username, u.badge, 0 as liked_by_me
+             FROM posts p
+             JOIN users u ON p.author_uuid = u.uuid
+             {where_sql}
+             ORDER BY (p.likes * 10 + CAST((julianday('now') - julianday(p.created_at)) * -24 AS INTEGER)) DESC
+             LIMIT ? OFFSET ?"
+        )
+    };
 
     let mut stmt = match db.prepare(&feed_query) {
         Ok(s) => s,
@@ -395,6 +424,9 @@ async fn get_feed(
 
     let mut param_refs: Vec<&dyn rusqlite::types::ToSql> =
         params.iter().map(|p| p.as_ref()).collect();
+    if has_user {
+        param_refs.insert(0, &user_uuid as &dyn rusqlite::types::ToSql);
+    }
     param_refs.push(&limit);
     param_refs.push(&offset);
 
@@ -415,7 +447,7 @@ async fn get_feed(
                 likes: row.get(6)?,
                 author_username: row.get(7)?,
                 author_badge: row.get(8)?,
-                liked_by_me: false,
+                liked_by_me: row.get::<_, i32>(9)? > 0,
                 hashtags: extract_hashtags(&content),
                 mentions: extract_mentions(&content),
             })
@@ -430,37 +462,72 @@ async fn get_feed(
 async fn get_post(
     State(db): State<Db>,
     Path(id): Path<String>,
+    Query(query): Query<FeedQuery>,
 ) -> impl IntoResponse {
     let db = db.lock().await;
+    let user_uuid = query.user_uuid.as_deref().unwrap_or("");
 
-    let post = db.query_row(
-        "SELECT p.id, p.author_uuid, p.content, p.post_type, p.attachment_data, p.created_at, p.likes,
-                u.minecraft_username, u.badge
-         FROM posts p
-         JOIN users u ON p.author_uuid = u.uuid
-         WHERE p.id = ?1",
-        rusqlite::params![id],
-        |row| {
-            let attachment_str: Option<String> = row.get(4)?;
-            let attachment_data = attachment_str.and_then(|s| serde_json::from_str(&s).ok());
-            let content: String = row.get(2)?;
+    let post = if !user_uuid.is_empty() {
+        db.query_row(
+            "SELECT p.id, p.author_uuid, p.content, p.post_type, p.attachment_data, p.created_at, p.likes,
+                    u.minecraft_username, u.badge,
+                    CASE WHEN l.user_uuid IS NOT NULL THEN 1 ELSE 0 END as liked_by_me
+             FROM posts p
+             JOIN users u ON p.author_uuid = u.uuid
+             LEFT JOIN likes l ON l.post_id = p.id AND l.user_uuid = ?2
+             WHERE p.id = ?1",
+            rusqlite::params![id, user_uuid],
+            |row| {
+                let attachment_str: Option<String> = row.get(4)?;
+                let attachment_data = attachment_str.and_then(|s| serde_json::from_str(&s).ok());
+                let content: String = row.get(2)?;
 
-            Ok(PostRecord {
-                id: row.get(0)?,
-                author_uuid: row.get(1)?,
-                content: content.clone(),
-                post_type: row.get(3)?,
-                attachment_data,
-                created_at: row.get(5)?,
-                likes: row.get(6)?,
-                author_username: row.get(7)?,
-                author_badge: row.get(8)?,
-                liked_by_me: false,
-                hashtags: extract_hashtags(&content),
-                mentions: extract_mentions(&content),
-            })
-        },
-    );
+                Ok(PostRecord {
+                    id: row.get(0)?,
+                    author_uuid: row.get(1)?,
+                    content: content.clone(),
+                    post_type: row.get(3)?,
+                    attachment_data,
+                    created_at: row.get(5)?,
+                    likes: row.get(6)?,
+                    author_username: row.get(7)?,
+                    author_badge: row.get(8)?,
+                    liked_by_me: row.get::<_, i32>(9)? > 0,
+                    hashtags: extract_hashtags(&content),
+                    mentions: extract_mentions(&content),
+                })
+            },
+        )
+    } else {
+        db.query_row(
+            "SELECT p.id, p.author_uuid, p.content, p.post_type, p.attachment_data, p.created_at, p.likes,
+                    u.minecraft_username, u.badge, 0 as liked_by_me
+             FROM posts p
+             JOIN users u ON p.author_uuid = u.uuid
+             WHERE p.id = ?1",
+            rusqlite::params![id],
+            |row| {
+                let attachment_str: Option<String> = row.get(4)?;
+                let attachment_data = attachment_str.and_then(|s| serde_json::from_str(&s).ok());
+                let content: String = row.get(2)?;
+
+                Ok(PostRecord {
+                    id: row.get(0)?,
+                    author_uuid: row.get(1)?,
+                    content: content.clone(),
+                    post_type: row.get(3)?,
+                    attachment_data,
+                    created_at: row.get(5)?,
+                    likes: row.get(6)?,
+                    author_username: row.get(7)?,
+                    author_badge: row.get(8)?,
+                    liked_by_me: false,
+                    hashtags: extract_hashtags(&content),
+                    mentions: extract_mentions(&content),
+                })
+            },
+        )
+    };
 
     match post {
         Ok(p) => Json(p).into_response(),
@@ -524,16 +591,20 @@ async fn trending_hashtags(
     State(db): State<Db>,
 ) -> impl IntoResponse {
     let db = db.lock().await;
-    let mut stmt = db
-        .prepare(
-            "SELECT h.tag, COUNT(*) as count
-             FROM hashtags h
-             WHERE h.created_at > datetime('now', '-7 days')
-             GROUP BY h.tag
-             ORDER BY count DESC
-             LIMIT 20",
-        )
-        .unwrap();
+    let mut stmt = match db.prepare(
+        "SELECT h.tag, COUNT(*) as count
+         FROM hashtags h
+         WHERE h.created_at > datetime('now', '-7 days')
+         GROUP BY h.tag
+         ORDER BY count DESC
+         LIMIT 20",
+    ) {
+        Ok(s) => s,
+        Err(e) => {
+            error!("Failed to prepare trending_hashtags query: {e}");
+            return (StatusCode::INTERNAL_SERVER_ERROR, "Query failed").into_response();
+        }
+    };
 
     let tags: Vec<serde_json::Value> = stmt
         .query_map([], |row| {
